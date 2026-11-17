@@ -23,13 +23,13 @@ class CustomTable extends StatelessWidget {
 
   /// Cellule texte standard.
   static Widget cell(String text, {bool muted = false}) => Text(
-        text,
-        overflow: TextOverflow.ellipsis,
-        maxLines: 2,
-        style: GoogleFonts.inter(
-            fontSize: 13,
-            color: muted ? AppColors.textSecondary : AppColors.textPrimary),
-      );
+    text,
+    overflow: TextOverflow.ellipsis,
+    maxLines: 2,
+    style: GoogleFonts.inter(
+        fontSize: 13,
+        color: muted ? AppColors.textSecondary : AppColors.textPrimary),
+  );
 
   Widget _line(List<Widget> cells, {required bool header}) {
     return Container(
@@ -61,7 +61,7 @@ class CustomTable extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final width =
-            constraints.maxWidth < minWidth ? minWidth : constraints.maxWidth;
+        constraints.maxWidth < minWidth ? minWidth : constraints.maxWidth;
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [

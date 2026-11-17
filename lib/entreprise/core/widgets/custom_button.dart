@@ -36,59 +36,59 @@ class CustomButton extends StatelessWidget {
     final padding = EdgeInsets.symmetric(horizontal: compact ? 14 : 18);
     final shape = RoundedRectangleBorder(borderRadius: BorderRadius.circular(6));
     final textStyle =
-        GoogleFonts.inter(fontSize: fontSize, fontWeight: FontWeight.w500);
+    GoogleFonts.inter(fontSize: fontSize, fontWeight: FontWeight.w500);
     final callback = isLoading ? null : onPressed;
 
     final content = isLoading
         ? const SizedBox(
-            width: 18,
-            height: 18,
-            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-          )
+      width: 18,
+      height: 18,
+      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+    )
         : Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (icon != null) ...[
-                Icon(icon, size: 16),
-                const SizedBox(width: 8),
-              ],
-              Text(label),
-              if (trailingIcon != null) ...[
-                const SizedBox(width: 8),
-                Icon(trailingIcon, size: 16),
-              ],
-            ],
-          );
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        if (icon != null) ...[
+          Icon(icon, size: 16),
+          const SizedBox(width: 8),
+        ],
+        Text(label),
+        if (trailingIcon != null) ...[
+          const SizedBox(width: 8),
+          Icon(trailingIcon, size: 16),
+        ],
+      ],
+    );
 
     final Widget button = variant == ButtonVariant.primary
         ? ElevatedButton(
-            onPressed: callback,
-            style: ElevatedButton.styleFrom(
-              minimumSize: Size(0, height),
-              padding: padding,
-              textStyle: textStyle,
-              shape: shape,
-            ),
-            child: content,
-          )
+      onPressed: callback,
+      style: ElevatedButton.styleFrom(
+        minimumSize: Size(0, height),
+        padding: padding,
+        textStyle: textStyle,
+        shape: shape,
+      ),
+      child: content,
+    )
         : OutlinedButton(
-            onPressed: callback,
-            style: OutlinedButton.styleFrom(
-              elevation: 0,
-              minimumSize: Size(0, height),
-              padding: padding,
-              textStyle: textStyle,
-              shape: shape,
-              foregroundColor: AppColors.textPrimary,
-              backgroundColor: AppColors.white,
-              disabledBackgroundColor: AppColors.disabledBg,
-              disabledForegroundColor: AppColors.disabledText,
-              side: BorderSide(
-                  color: callback == null ? AppColors.disabledBg : AppColors.border),
-            ),
-            child: content,
-          );
+      onPressed: callback,
+      style: OutlinedButton.styleFrom(
+        elevation: 0,
+        minimumSize: Size(0, height),
+        padding: padding,
+        textStyle: textStyle,
+        shape: shape,
+        foregroundColor: AppColors.textPrimary,
+        backgroundColor: AppColors.white,
+        disabledBackgroundColor: AppColors.disabledBg,
+        disabledForegroundColor: AppColors.disabledText,
+        side: BorderSide(
+            color: callback == null ? AppColors.disabledBg : AppColors.border),
+      ),
+      child: content,
+    );
 
     return SizedBox(
       width: expand ? double.infinity : null,

@@ -5,7 +5,7 @@ import '../../../widgets/custom_card.dart';
 import '../../../widgets/custom_table.dart';
 import '../../../widgets/empty_state.dart';
 import '../../../widgets/status_badge.dart';
-import '../../../services/mock_store.dart';
+import '../../../services/app_store.dart';
 
 class InvitedCandidatesCard extends StatelessWidget {
   const InvitedCandidatesCard({super.key});
@@ -25,7 +25,7 @@ class InvitedCandidatesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final store = MockStore.instance;
+    final store = AppStore.instance;
 
     return ListenableBuilder(
       listenable: store,
@@ -51,7 +51,7 @@ class InvitedCandidatesCard extends StatelessWidget {
               icon: Icons.mail_outline,
               title: 'Aucun candidat invité',
               message:
-                  'Les candidats invités et leur statut apparaîtront ici après la génération des clés.',
+              'Les candidats invités et leur statut apparaîtront ici après la génération des clés.',
               verticalPadding: 36,
             ),
           ),

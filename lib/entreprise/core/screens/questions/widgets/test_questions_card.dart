@@ -8,7 +8,8 @@ import '../../../widgets/custom_card.dart';
 import '../../../widgets/empty_state.dart';
 import '../../../widgets/info_note.dart';
 import '../../../models/question_model.dart';
-import '../../../services/mock_store.dart';
+import '../../../services/api_client.dart';
+import '../../../services/app_store.dart';
 
 class TestQuestionsCard extends StatelessWidget {
   const TestQuestionsCard({
@@ -47,15 +48,28 @@ class TestQuestionsCard extends StatelessWidget {
       ),
     );
     if (ok == true && context.mounted) {
-      MockStore.instance.deleteQuestion(q.id);
+      try {
+        await AppStore.instance.deleteQuestion(q.id);
+      } catch (e) {
+        if (context.mounted) AppSnackbar.error(context, ApiClient.errorMessage(e));
+        return;
+      }
       onDeleted(q.id);
-      AppSnackbar.success(context, 'Question supprimée.');
+      if (context.mounted) AppSnackbar.success(context, 'Question supprimée.');
+    }
+  }
+
+  Future<void> _move(BuildContext context, String id, int delta) async {
+    try {
+      await AppStore.instance.moveQuestion(id, delta);
+    } catch (e) {
+      if (context.mounted) AppSnackbar.error(context, ApiClient.errorMessage(e));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final store = MockStore.instance;
+    final store = AppStore.instance;
 
     return ListenableBuilder(
       listenable: store,
@@ -123,7 +137,7 @@ class TestQuestionsCard extends StatelessWidget {
                     variant: ButtonVariant.secondary,
                     onPressed: (selected == null || index == 0)
                         ? null
-                        : () => store.moveQuestion(selected.id, -1),
+                        : () => _move(context, selected.id, -1),
                   ),
                   CustomButton(
                     label: 'Descendre',
@@ -132,7 +146,7 @@ class TestQuestionsCard extends StatelessWidget {
                     variant: ButtonVariant.secondary,
                     onPressed: (selected == null || index == questions.length - 1)
                         ? null
-                        : () => store.moveQuestion(selected.id, 1),
+                        : () => _move(context, selected.id, 1),
                   ),
                 ],
               ),

@@ -32,7 +32,7 @@ class StatusBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
       decoration:
-          BoxDecoration(color: bg, borderRadius: BorderRadius.circular(20)),
+      BoxDecoration(color: bg, borderRadius: BorderRadius.circular(20)),
       child: Text(
         label,
         style: GoogleFonts.inter(

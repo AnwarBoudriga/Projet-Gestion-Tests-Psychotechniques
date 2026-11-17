@@ -6,6 +6,8 @@ import '../../../widgets/custom_card.dart';
 import '../../../widgets/custom_dropdown.dart';
 import '../../../widgets/info_note.dart';
 import '../../../models/invitation_model.dart';
+import '../../../services/api_client.dart';
+import '../../../services/app_store.dart';
 
 class CandidateSelectionCard extends StatelessWidget {
   const CandidateSelectionCard({
@@ -21,10 +23,17 @@ class CandidateSelectionCard extends StatelessWidget {
   final bool hasResult;
   final ValueChanged<String> onChanged;
 
-  // Export simulé : aucun fichier n'est généré (pas de backend).
-  void _export(BuildContext context, String format) {
-    AppSnackbar.success(
-        context, 'Export $format de « ${selected!.name} » généré (simulation).');
+  // Télécharge le fichier généré par l'API (CSV ou PDF).
+  Future<void> _export(BuildContext context, String format) async {
+    final name = selected!.name;
+    try {
+      await AppStore.instance.exportResult(selected!.id, format.toLowerCase());
+      if (context.mounted) {
+        AppSnackbar.success(context, 'Export $format de « $name » téléchargé.');
+      }
+    } catch (e) {
+      if (context.mounted) AppSnackbar.error(context, ApiClient.errorMessage(e));
+    }
   }
 
   @override

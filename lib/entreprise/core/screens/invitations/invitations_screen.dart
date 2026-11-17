@@ -4,6 +4,7 @@ import '../../widgets/app_shell.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/responsive_row.dart';
 import '../../navigation/app_router.dart';
+import '../../services/app_store.dart';
 import 'widgets/generate_key_card.dart';
 import 'widgets/import_csv_card.dart';
 import 'widgets/invited_candidates_card.dart';
@@ -20,6 +21,12 @@ class _InvitationsScreenState extends State<InvitationsScreen> {
   // réutilisés par l'import CSV.
   String? _testId;
   int? _days;
+
+  @override
+  void initState() {
+    super.initState();
+    AppStore.instance.loadAll().catchError((Object _) {});
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -7,7 +7,10 @@ import '../../../widgets/custom_dropdown.dart';
 import '../../../widgets/custom_text_field.dart';
 import '../../../widgets/info_note.dart';
 import '../../../widgets/responsive_row.dart';
-import '../../../services/mock_store.dart';
+import '../../../services/api_client.dart';
+import '../../../services/app_store.dart';
+import '../../../widgets/app_snackbar.dart';
+import '../../../models/invitation_model.dart';
 import 'expiry_options.dart';
 import 'key_dialog.dart';
 
@@ -43,9 +46,9 @@ class _GenerateKeyCardState extends State<GenerateKeyCard> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     final valid = _formKey.currentState!.validate();
-    final store = MockStore.instance;
+    final store = AppStore.instance;
     final test = store.testById(widget.testId);
     setState(() {
       _testError = test == null ? 'Choisissez un test.' : null;
@@ -53,12 +56,19 @@ class _GenerateKeyCardState extends State<GenerateKeyCard> {
     });
     if (!valid || test == null || widget.days == null) return;
 
-    final inv = store.createInvitation(
-      name: _name.text.trim(),
-      email: _email.text.trim(),
-      test: test,
-      days: widget.days!,
-    );
+    final InvitationModel inv;
+    try {
+      inv = await store.createInvitation(
+        name: _name.text.trim(),
+        email: _email.text.trim(),
+        test: test,
+        days: widget.days!,
+      );
+    } catch (e) {
+      if (mounted) AppSnackbar.error(context, ApiClient.errorMessage(e));
+      return;
+    }
+    if (!mounted) return;
     _name.clear();
     _email.clear();
     _formKey.currentState!.reset();
@@ -67,7 +77,7 @@ class _GenerateKeyCardState extends State<GenerateKeyCard> {
 
   @override
   Widget build(BuildContext context) {
-    final store = MockStore.instance;
+    final store = AppStore.instance;
 
     return ListenableBuilder(
       listenable: store,
@@ -75,7 +85,7 @@ class _GenerateKeyCardState extends State<GenerateKeyCard> {
         final published = store.publishedTests;
         final hasTests = published.isNotEmpty;
         final testValue =
-            published.any((t) => t.id == widget.testId) ? widget.testId : null;
+        published.any((t) => t.id == widget.testId) ? widget.testId : null;
         const gap = SizedBox(height: 16);
 
         return CustomCard(

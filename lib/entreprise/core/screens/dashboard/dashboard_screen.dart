@@ -4,17 +4,29 @@ import '../../widgets/app_shell.dart';
 import '../../widgets/page_header.dart';
 import '../../widgets/stat_card.dart';
 import '../../navigation/app_router.dart';
-import '../../services/mock_store.dart';
+import '../../services/app_store.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Rafraîchit les chiffres à chaque ouverture (les candidats passent leurs tests en parallèle).
+    AppStore.instance.loadAll().catchError((Object _) {});
+  }
 
   // Les maquettes affichent « — » tant qu'il n'y a pas de données.
   static const String _empty = '—';
 
   @override
   Widget build(BuildContext context) {
-    final store = MockStore.instance;
+    final store = AppStore.instance;
 
     return AppShell(
       currentRoute: AppRoutes.dashboard,
@@ -22,23 +34,21 @@ class DashboardScreen extends StatelessWidget {
       child: ListenableBuilder(
         listenable: store,
         builder: (context, _) {
-          final results = store.results;
-          final rate = results.isEmpty
+          final stats = store.stats;
+          final rate = stats.tauxReussite == null
               ? _empty
-              : '${(results.where((r) => r.passed).length * 100 / results.length).round()} %';
+              : '${stats.tauxReussite!.round()} %';
 
           final cards = [
             StatCard(
               label: 'Tests',
               icon: Icons.assignment_outlined,
-              value: store.tests.isEmpty ? _empty : '${store.tests.length}',
+              value: stats.tests == 0 ? _empty : '${stats.tests}',
             ),
             StatCard(
               label: 'Candidats',
               icon: Icons.group_outlined,
-              value: store.invitations.isEmpty
-                  ? _empty
-                  : '${store.invitations.length}',
+              value: stats.candidats == 0 ? _empty : '${stats.candidats}',
             ),
             StatCard(
               label: 'Taux de réussite',

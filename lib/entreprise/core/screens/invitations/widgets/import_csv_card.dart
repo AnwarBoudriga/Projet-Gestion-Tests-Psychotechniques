@@ -9,7 +9,8 @@ import '../../../widgets/dashed_border_box.dart';
 import '../../../widgets/info_note.dart';
 import '../../../services/csv_parser.dart';
 import '../../../services/csv_picker_service.dart';
-import '../../../services/mock_store.dart';
+import '../../../services/api_client.dart';
+import '../../../services/app_store.dart';
 
 class ImportCsvCard extends StatefulWidget {
   const ImportCsvCard({super.key, required this.testId, required this.days});
@@ -41,10 +42,10 @@ class _ImportCsvCardState extends State<ImportCsvCard> {
     }
   }
 
-  void _generate() {
+  Future<void> _generate() async {
     final parsed = _parsed;
     if (parsed == null) return;
-    final store = MockStore.instance;
+    final store = AppStore.instance;
     final test = store.testById(widget.testId);
     final days = widget.days;
 
@@ -59,8 +60,16 @@ class _ImportCsvCardState extends State<ImportCsvCard> {
       return;
     }
 
-    final n = store.createInvitations(parsed.rows, test: test, days: days);
-    final skipped = parsed.skipped;
+    final ImportOutcome outcome;
+    try {
+      outcome = await store.createInvitations(parsed.rows, test: test, days: days);
+    } catch (e) {
+      if (mounted) AppSnackbar.error(context, ApiClient.errorMessage(e));
+      return;
+    }
+    if (!mounted) return;
+    final n = outcome.created;
+    final skipped = parsed.skipped + outcome.rejected;
     setState(() {
       _file = null;
       _parsed = null;
@@ -68,7 +77,7 @@ class _ImportCsvCardState extends State<ImportCsvCard> {
     AppSnackbar.success(
       context,
       '$n clé${n > 1 ? 's' : ''} générée${n > 1 ? 's' : ''}'
-      '${skipped > 0 ? ' ($skipped ligne${skipped > 1 ? 's' : ''} ignorée${skipped > 1 ? 's' : ''})' : ''}.',
+          '${skipped > 0 ? ' ($skipped ligne${skipped > 1 ? 's' : ''} ignorée${skipped > 1 ? 's' : ''})' : ''}.',
     );
   }
 

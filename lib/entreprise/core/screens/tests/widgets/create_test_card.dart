@@ -9,7 +9,9 @@ import '../../../widgets/custom_button.dart';
 import '../../../widgets/custom_card.dart';
 import '../../../widgets/custom_text_field.dart';
 import '../../../widgets/responsive_row.dart';
-import '../../../services/mock_store.dart';
+import '../../../models/test_model.dart';
+import '../../../services/api_client.dart';
+import '../../../services/app_store.dart';
 
 class CreateTestCard extends StatefulWidget {
   const CreateTestCard({super.key});
@@ -35,17 +37,31 @@ class _CreateTestCardState extends State<CreateTestCard> {
     super.dispose();
   }
 
-  void _submit() {
-    if (!_formKey.currentState!.validate()) return;
+  bool _busy = false;
 
-    final test = MockStore.instance.createTest(
-      title: _title.text.trim(),
-      description: _description.text.trim(),
-      durationMinutes: int.parse(_duration.text.trim()),
-      category: _category.text.trim(),
-      minScore: int.parse(_minScore.text.trim()),
-      showScore: _showScore,
-    );
+  Future<void> _submit() async {
+    if (_busy || !_formKey.currentState!.validate()) return;
+
+    setState(() => _busy = true);
+    final TestModel test;
+    try {
+      test = await AppStore.instance.createTest(
+        title: _title.text.trim(),
+        description: _description.text.trim(),
+        durationMinutes: int.parse(_duration.text.trim()),
+        category: _category.text.trim(),
+        minScore: int.parse(_minScore.text.trim()),
+        showScore: _showScore,
+      );
+    } catch (e) {
+      if (mounted) {
+        setState(() => _busy = false);
+        AppSnackbar.error(context, ApiClient.errorMessage(e));
+      }
+      return;
+    }
+    if (!mounted) return;
+    setState(() => _busy = false);
 
     for (final c in [_title, _description, _duration, _category, _minScore]) {
       c.clear();
@@ -150,6 +166,7 @@ class _CreateTestCardState extends State<CreateTestCard> {
                 label: 'Créer le test',
                 icon: Icons.add,
                 compact: true,
+                isLoading: _busy,
                 onPressed: _submit,
               ),
             ),

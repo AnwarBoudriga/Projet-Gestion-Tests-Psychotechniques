@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../navigation/app_router.dart';
 import '../navigation/nav_items.dart';
 import '../constants/app_colors.dart';
+import '../services/auth_service.dart';
 import 'psytech_logo.dart';
 
 /// Sidebar de navigation (fixe à gauche sur grand écran, Drawer sinon).
@@ -20,7 +21,9 @@ class Sidebar extends StatelessWidget {
     Navigator.of(context).pushReplacementNamed(route);
   }
 
-  void _logout(BuildContext context) {
+  Future<void> _logout(BuildContext context) async {
+    await AuthService().logout();
+    if (!context.mounted) return;
     Navigator.of(context)
         .pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
   }

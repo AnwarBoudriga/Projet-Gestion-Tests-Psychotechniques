@@ -34,9 +34,9 @@ class AppShell extends StatelessWidget {
           drawer: wide
               ? null
               : Drawer(
-                  width: sidebarWidth,
-                  child: Sidebar(currentRoute: currentRoute),
-                ),
+            width: sidebarWidth,
+            child: Sidebar(currentRoute: currentRoute),
+          ),
           body: Row(
             children: [
               if (wide)
@@ -51,7 +51,7 @@ class AppShell extends StatelessWidget {
                     Expanded(
                       child: SingleChildScrollView(
                         padding:
-                            EdgeInsets.fromLTRB(horizontal, 32, horizontal, 32),
+                        EdgeInsets.fromLTRB(horizontal, 32, horizontal, 32),
                         child: Align(
                           alignment: Alignment.topLeft,
                           child: ConstrainedBox(

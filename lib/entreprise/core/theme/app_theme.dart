@@ -42,7 +42,7 @@ class AppTheme {
         fillColor: AppColors.white,
         isDense: true,
         contentPadding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         hintStyle: GoogleFonts.inter(
           fontSize: 13,
           color: AppColors.textSecondary.withValues(alpha: 0.8),
@@ -63,7 +63,7 @@ class AppTheme {
           disabledForegroundColor: AppColors.disabledText,
           padding: const EdgeInsets.symmetric(horizontal: 18),
           textStyle:
-              GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500),
+          GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(radius),
           ),

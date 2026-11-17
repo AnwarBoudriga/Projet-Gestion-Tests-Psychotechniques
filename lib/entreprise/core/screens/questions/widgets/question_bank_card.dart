@@ -6,7 +6,8 @@ import '../../../widgets/app_snackbar.dart';
 import '../../../widgets/custom_button.dart';
 import '../../../widgets/custom_card.dart';
 import '../../../widgets/empty_state.dart';
-import '../../../services/mock_store.dart';
+import '../../../services/api_client.dart';
+import '../../../services/app_store.dart';
 
 class QuestionBankCard extends StatefulWidget {
   const QuestionBankCard({super.key});
@@ -18,15 +19,22 @@ class QuestionBankCard extends StatefulWidget {
 class _QuestionBankCardState extends State<QuestionBankCard> {
   final Set<String> _checked = {};
 
-  void _use() {
-    final store = MockStore.instance;
+  Future<void> _use() async {
+    final store = AppStore.instance;
     final test = store.selectedTest;
     if (test == null) {
       AppSnackbar.error(context,
           'Créez ou sélectionnez d’abord un test dans la page « Tests ».');
       return;
     }
-    final n = store.addFromBank(test.id, _checked);
+    final int n;
+    try {
+      n = await store.addFromBank(test.id, _checked);
+    } catch (e) {
+      if (mounted) AppSnackbar.error(context, ApiClient.errorMessage(e));
+      return;
+    }
+    if (!mounted) return;
     setState(_checked.clear);
     AppSnackbar.success(context,
         '$n question${n > 1 ? 's' : ''} ajoutée${n > 1 ? 's' : ''} au test « ${test.title} ».');
@@ -34,7 +42,7 @@ class _QuestionBankCardState extends State<QuestionBankCard> {
 
   @override
   Widget build(BuildContext context) {
-    final store = MockStore.instance;
+    final store = AppStore.instance;
 
     return ListenableBuilder(
       listenable: store,

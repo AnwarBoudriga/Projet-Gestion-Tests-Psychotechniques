@@ -17,22 +17,22 @@ class PsyTechLogo extends StatelessWidget {
 
     final glyph = light
         ? Container(
-            width: 34,
-            height: 34,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.circular(9),
-            ),
-            child: Text('Ψ',
-                style: GoogleFonts.inter(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.navy)),
-          )
+      width: 34,
+      height: 34,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(9),
+      ),
+      child: Text('Ψ',
+          style: GoogleFonts.inter(
+              fontSize: 22,
+              fontWeight: FontWeight.w600,
+              color: AppColors.navy)),
+    )
         : Text('Ψ',
-            style: GoogleFonts.inter(
-                fontSize: 34, fontWeight: FontWeight.w300, color: mainColor));
+        style: GoogleFonts.inter(
+            fontSize: 34, fontWeight: FontWeight.w300, color: mainColor));
 
     final name = Text.rich(
       TextSpan(

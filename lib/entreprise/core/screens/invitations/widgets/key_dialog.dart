@@ -7,10 +7,10 @@ import '../../../widgets/app_snackbar.dart';
 
 /// Affiche la clé générée (avec bouton Copier).
 Future<void> showKeyDialog(
-  BuildContext context, {
-  required String name,
-  required String keyValue,
-}) {
+    BuildContext context, {
+      required String name,
+      required String keyValue,
+    }) {
   return showDialog<void>(
     context: context,
     builder: (ctx) => AlertDialog(

@@ -31,7 +31,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
           const PageHeader(
             title: 'Gestion des questions',
             subtitle:
-                'Ajoutez vos questions ou utilisez celles de la banque du Super Administrateur.',
+            'Ajoutez vos questions ou utilisez celles de la banque du Super Administrateur.',
           ),
           ResponsiveRow(
             flexes: const [3, 2],

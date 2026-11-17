@@ -10,35 +10,48 @@ import '../../../widgets/empty_state.dart';
 import '../../../widgets/info_note.dart';
 import '../../../widgets/status_badge.dart';
 import '../../../models/test_model.dart';
-import '../../../services/mock_store.dart';
+import '../../../services/api_client.dart';
+import '../../../services/app_store.dart';
 
 class ManageTestCard extends StatelessWidget {
   const ManageTestCard({super.key});
 
-  void _duplicate(BuildContext context, TestModel t) {
-    final copy = MockStore.instance.duplicateTest(t.id);
-    if (copy != null) {
-      AppSnackbar.success(context, 'Test dupliqué : « ${copy.title} ».');
+  Future<void> _duplicate(BuildContext context, TestModel t) async {
+    try {
+      final copy = await AppStore.instance.duplicateTest(t.id);
+      if (context.mounted) {
+        AppSnackbar.success(context, 'Test dupliqué : « ${copy.title} ».');
+      }
+    } catch (e) {
+      if (context.mounted) AppSnackbar.error(context, ApiClient.errorMessage(e));
     }
   }
 
-  void _publish(BuildContext context, TestModel t) {
-    final error = MockStore.instance.publishTest(t.id);
-    if (error != null) {
-      AppSnackbar.error(context, error);
-    } else {
-      AppSnackbar.success(context, 'Test « ${t.title} » publié.');
+  Future<void> _publish(BuildContext context, TestModel t) async {
+    try {
+      await AppStore.instance.publishTest(t.id);
+      if (context.mounted) {
+        AppSnackbar.success(context, 'Test « ${t.title} » publié.');
+      }
+    } catch (e) {
+      if (context.mounted) AppSnackbar.error(context, ApiClient.errorMessage(e));
     }
   }
 
-  void _unpublish(BuildContext context, TestModel t) {
-    MockStore.instance.unpublishTest(t.id);
-    AppSnackbar.success(context, 'Test « ${t.title} » dépublié.');
+  Future<void> _unpublish(BuildContext context, TestModel t) async {
+    try {
+      await AppStore.instance.unpublishTest(t.id);
+      if (context.mounted) {
+        AppSnackbar.success(context, 'Test « ${t.title} » dépublié.');
+      }
+    } catch (e) {
+      if (context.mounted) AppSnackbar.error(context, ApiClient.errorMessage(e));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final store = MockStore.instance;
+    final store = AppStore.instance;
 
     return ListenableBuilder(
       listenable: store,
@@ -78,7 +91,7 @@ class ManageTestCard extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   child: _TestDetails(
                     test: selected,
-                    questionCount: store.questionsOf(selected.id).length,
+                    questionCount: store.questionCountOf(selected),
                   ),
                 ),
               const Divider(height: 24, color: AppColors.border),
@@ -92,7 +105,7 @@ class ManageTestCard extends StatelessWidget {
                     compact: true,
                     variant: ButtonVariant.secondary,
                     onPressed:
-                        selected == null ? null : () => _duplicate(context, selected),
+                    selected == null ? null : () => _duplicate(context, selected),
                   ),
                   CustomButton(
                     label: 'Publier',
@@ -132,24 +145,24 @@ class _TestDetails extends StatelessWidget {
   final int questionCount;
 
   Widget _row(String label, String value) => Padding(
-        padding: const EdgeInsets.only(top: 6),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: 120,
-              child: Text(label,
-                  style: GoogleFonts.inter(
-                      fontSize: 12, color: AppColors.textSecondary)),
-            ),
-            Expanded(
-              child: Text(value,
-                  style: GoogleFonts.inter(
-                      fontSize: 12.5, color: AppColors.textPrimary)),
-            ),
-          ],
+    padding: const EdgeInsets.only(top: 6),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 120,
+          child: Text(label,
+              style: GoogleFonts.inter(
+                  fontSize: 12, color: AppColors.textSecondary)),
         ),
-      );
+        Expanded(
+          child: Text(value,
+              style: GoogleFonts.inter(
+                  fontSize: 12.5, color: AppColors.textPrimary)),
+        ),
+      ],
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {

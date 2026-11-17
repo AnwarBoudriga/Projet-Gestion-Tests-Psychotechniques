@@ -9,7 +9,8 @@ import '../../../widgets/custom_dropdown.dart';
 import '../../../widgets/custom_text_field.dart';
 import '../../../widgets/responsive_row.dart';
 import '../../../models/question_model.dart';
-import '../../../services/mock_store.dart';
+import '../../../services/api_client.dart';
+import '../../../services/app_store.dart';
 
 /// Formulaire d'ajout (ou de modification) d'une question.
 class AddQuestionCard extends StatefulWidget {
@@ -90,42 +91,50 @@ class _AddQuestionCardState extends State<AddQuestionCard> {
     widget.onFinished();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     final valid = _formKey.currentState!.validate();
     final missingCorrect = _correct == null;
     setState(() => _correctError =
-        missingCorrect ? 'Choisissez la réponse correcte.' : null);
+    missingCorrect ? 'Choisissez la réponse correcte.' : null);
     if (!valid || missingCorrect) return;
 
-    final store = MockStore.instance;
+    final store = AppStore.instance;
     final options = [for (final c in _options) c.text.trim()];
     final points = int.parse(_points.text.trim());
     final editing = widget.editing;
+    String message;
 
-    if (editing != null) {
-      store.updateQuestion(editing.copyWith(
-        text: _text.text.trim(),
-        options: options,
-        correctIndex: _correct,
-        points: points,
-      ));
-      AppSnackbar.success(context, 'Question modifiée.');
-    } else {
-      final test = store.selectedTest;
-      if (test == null) {
-        AppSnackbar.error(context,
-            'Créez ou sélectionnez d’abord un test dans la page « Tests ».');
-        return;
+    try {
+      if (editing != null) {
+        await store.updateQuestion(editing.copyWith(
+          text: _text.text.trim(),
+          options: options,
+          correctIndex: _correct,
+          points: points,
+        ));
+        message = 'Question modifiée.';
+      } else {
+        final test = store.selectedTest;
+        if (test == null) {
+          AppSnackbar.error(context,
+              'Créez ou sélectionnez d’abord un test dans la page « Tests ».');
+          return;
+        }
+        await store.addQuestion(
+          testId: test.id,
+          text: _text.text.trim(),
+          options: options,
+          correctIndex: _correct!,
+          points: points,
+        );
+        message = 'Question ajoutée au test « ${test.title} ».';
       }
-      store.addQuestion(
-        testId: test.id,
-        text: _text.text.trim(),
-        options: options,
-        correctIndex: _correct!,
-        points: points,
-      );
-      AppSnackbar.success(context, 'Question ajoutée au test « ${test.title} ».');
+    } catch (e) {
+      if (mounted) AppSnackbar.error(context, ApiClient.errorMessage(e));
+      return;
     }
+    if (!mounted) return;
+    AppSnackbar.success(context, message);
     _clear();
     widget.onFinished();
   }
