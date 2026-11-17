@@ -1,10 +1,28 @@
-/// Service d'authentification fictif (aucun backend).
-class AuthService {
-  /// Clé de démonstration acceptée par le mock.
-  static const String mockCompanyKey = 'PSYTECH-2026';
+import 'package:dio/dio.dart';
 
+import 'api_client.dart';
+
+/// Authentification entreprise : la clé entreprise est vérifiée par l'API,
+/// qui renvoie un JWT conservé de façon sécurisée.
+///
+/// La signature `loginWithCompanyKey(String) -> Future<bool>` est inchangée :
+/// l'écran de connexion (LoginForm) n'a donc pas besoin d'être modifié.
+class AuthService {
   Future<bool> loginWithCompanyKey(String key) async {
-    await Future<void>.delayed(const Duration(milliseconds: 600));
-    return key.trim().toUpperCase() == mockCompanyKey;
+    try {
+      final r = await ApiClient.dio.post(
+        '/api/entreprise/auth/login',
+        data: {'cle': key.trim()},
+      );
+      final token = r.data['token'];
+      if (token is! String) return false;
+      await ApiClient.saveToken(token);
+      return true;
+    } on DioException {
+      // 401 (clé invalide), 403 (compte désactivé), 429 (trop de tentatives), réseau…
+      return false;
+    }
   }
+
+  Future<void> logout() => ApiClient.clearToken();
 }
